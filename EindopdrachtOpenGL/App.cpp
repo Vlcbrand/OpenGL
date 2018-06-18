@@ -97,16 +97,25 @@ int main() {
 
 		//draw
 		shaderProgram.use();
+
+		//change uniform variables in the shaders. (1 for offset, 1 for color)
+		GLfloat time = (GLfloat)glfwGetTime();
+		GLfloat blueColor = (sin(time) / 2) + 0.5f;
+		glm::vec2 pos;
+		pos.x = sin(time) / 2;
+		pos.y = cos(time) / 2;
+		shaderProgram.setUniform("vertColor", glm::vec4(0.0f, 0.0f, blueColor, 1.0f));
+		shaderProgram.setUniform("posOffset", pos);
+
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
-
 		glfwSwapBuffers(gWindow);
 	}
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
-
+	glDeleteBuffers(1, &ibo);
 
 	glfwTerminate();
 	return 0;

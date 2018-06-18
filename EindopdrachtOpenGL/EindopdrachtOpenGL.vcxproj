@@ -90,7 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GLFW;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\glm;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GLFW;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -119,7 +119,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GLFW;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\glm;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GLFW;C:\Users\Gebruiker\Source\Repos\EindopdrachtOpenGL\common\includes\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

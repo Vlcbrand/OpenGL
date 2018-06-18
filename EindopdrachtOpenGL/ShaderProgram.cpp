@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
 ShaderProgram::ShaderProgram() 
 {
 	mHandle = 0;
@@ -16,33 +17,42 @@ ShaderProgram::~ShaderProgram() {
 
 bool ShaderProgram::loadShaders(const char * vsFilename, const char * fsFilename)
 {
-	std::string vsString = fileToString(vsFilename);
-	std::string fsString = fileToString(fsFilename);
-	const GLchar* pvsSource = vsString.c_str();
-	const GLchar* pfsSource = fsString.c_str();
+	string vsString = fileToString(vsFilename);
+	string fsString = fileToString(fsFilename);
+	const GLchar* vsSourcePtr = vsString.c_str();
+	const GLchar* fsSourcePtr = fsString.c_str();
 
-	//vertexshader info
-	GLint vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &pvsSource, NULL);
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+
+	glShaderSource(vs, 1, &vsSourcePtr, NULL);
+	glShaderSource(fs, 1, &fsSourcePtr, NULL);
+
 	glCompileShader(vs);
-	checkCompileErrors(vs);
+	checkCompileErrors(vs, VERTEX);
 
-	//fragmentshader info
-	GLint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &pfsSource, NULL);
 	glCompileShader(fs);
-	checkCompileErrors(fs);
+	checkCompileErrors(fs, FRAGMENT);
 
-	//link shaders to program
 	mHandle = glCreateProgram();
+	if (mHandle == 0)
+	{
+		std::cerr << "Unable to create shader program!" << std::endl;
+		return false;
+	}
+
 	glAttachShader(mHandle, vs);
 	glAttachShader(mHandle, fs);
-	glLinkProgram(mHandle);
 
-	//shaders already linked
+	glLinkProgram(mHandle);
+	checkCompileErrors(mHandle, PROGRAM);
+
+
 	glDeleteShader(vs);
 	glDeleteShader(fs);
-	
+
+	mUniformLocations.clear();
+
 	return true;
 }
 
@@ -73,20 +83,59 @@ std::string ShaderProgram::fileToString(const std::string & filename)
 	return ss.str();
 }
 
-void ShaderProgram::checkCompileErrors(GLuint shader)
+void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type)
 {
 	int status = 0;
-	GLint length = 0;
 
-	glGetProgramiv(mHandle, GL_LINK_STATUS, &status);
-	if (!status)
+	if (type == PROGRAM)
 	{
-		glGetProgramiv(mHandle, GL_INFO_LOG_LENGTH, &length);
+		glGetProgramiv(mHandle, GL_LINK_STATUS, &status);
+		if (status == GL_FALSE)
+		{
+			GLint length = 0;
+			glGetProgramiv(mHandle, GL_INFO_LOG_LENGTH, &length);
 
-		std::string errorLog(length, ' ');
-		glGetProgramInfoLog(mHandle, length, &length, &errorLog[0]);
-		std::cerr << "Error! Shader (program) failed to link. " << errorLog << std::endl;
+			std::string errorLog(length, ' ');
+			glGetProgramInfoLog(mHandle, length, &length, &errorLog[0]);
+			std::cerr << "Error! Shader program failed to link. " << errorLog << std::endl;
+		}
+	}
+	else
+	{
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+		if (status == GL_FALSE)
+		{
+			GLint length = 0;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+			std::string errorLog(length, ' '); 
+			glGetShaderInfoLog(shader, length, &length, &errorLog[0]);
+			std::cerr << "Error! Shader failed to compile. " << errorLog << std::endl;
+		}
 	}
 
+}
+
+GLint ShaderProgram::getUniformLocation(const GLchar * name)
+{
+	std::map<std::string, GLint>::iterator it = mUniformLocations.find(name);
+	
+	//check if it exists, if not get it and set it
+	if (it == mUniformLocations.end())
+		mUniformLocations[name] = glGetUniformLocation(mHandle, name);
+
+	return mUniformLocations[name];
+}
+
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec2& vec2) {
+	GLint location = getUniformLocation(name);
+	glUniform2f(location, vec2.x, vec2.y);
+}
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& vec3) {
+	GLint location = getUniformLocation(name);
+	glUniform3f(location, vec3.x, vec3.y, vec3.z);
+}
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec4& vec4) {
+	GLint location = getUniformLocation(name);
+	glUniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
 }
 	

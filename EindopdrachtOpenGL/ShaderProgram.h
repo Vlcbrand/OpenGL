@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <glew.h>
+#include <glm.hpp>
+#include <map>
 
 class ShaderProgram
 {
@@ -12,11 +14,23 @@ public:
 		FRAGMENT,
 		PROGRAM
 	};
+
 	bool loadShaders(const char* vsFilename, const char* fsFilename);
 	void use();
+
+	void setUniform(const GLchar* name, const glm::vec2& vec2);
+	void setUniform(const GLchar* name, const glm::vec3& vec3);
+	void setUniform(const GLchar* name, const glm::vec4& vec4);
+
+
+
 private:
 	std::string fileToString(const std::string& filename);
-	void checkCompileErrors(GLuint shader);
+	void checkCompileErrors(GLuint shader, ShaderType type);
+	GLint getUniformLocation(const GLchar* name);
+
+
 	GLuint mHandle;
+	std::map<std::string, GLint> mUniformLocations;
 };
 
