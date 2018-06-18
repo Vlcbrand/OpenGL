@@ -1,0 +1,5 @@
+enum Error {
+	GLFW_ERROR,
+	GLFW_WINDOW_ERROR,
+	GLEW_ERROR
+};
