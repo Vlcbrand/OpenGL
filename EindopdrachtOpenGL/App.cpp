@@ -59,8 +59,6 @@ bool initOpenGL() {
 void InitVertices() {
 	//cube
 	GLfloat vertices[] = {
-		// position		 // tex coords
-
 		// front face
 		-1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
 		1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
