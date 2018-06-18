@@ -21,6 +21,8 @@ public:
 	void setUniform(const GLchar* name, const glm::vec2& vec2);
 	void setUniform(const GLchar* name, const glm::vec3& vec3);
 	void setUniform(const GLchar* name, const glm::vec4& vec4);
+	void setUniform(const GLchar* name, const glm::mat4& mat4);
+
 
 	inline GLuint getProgram() const {
 		 return mHandle;

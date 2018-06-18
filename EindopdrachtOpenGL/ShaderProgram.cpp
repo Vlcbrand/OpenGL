@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "gtc/type_ptr.hpp"
 
 using namespace std;
 ShaderProgram::ShaderProgram() 
@@ -140,5 +141,11 @@ void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& vec3) {
 void ShaderProgram::setUniform(const GLchar* name, const glm::vec4& vec4) {
 	GLint location = getUniformLocation(name);
 	glUniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+}
+
+void ShaderProgram::setUniform(const GLchar * name, const glm::mat4 & mat4)
+{
+	GLint location = getUniformLocation(name);
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat4));
 }
 	

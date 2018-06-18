@@ -7,6 +7,7 @@
 #include "KeyHandler.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "gtc/matrix_transform.hpp"
 
 using namespace std;
 
@@ -18,9 +19,10 @@ GLFWwindow* gWindow = nullptr;
 GLuint vbo, vao, ibo;
 ShaderProgram shaderProgram;
 Texture2D texture1, texture2;
-const std::string texturePath1 = "airplane.png";
-const std::string texturePath2 = "crate.jpg";
+const std::string texturePath = "wooden_crate.jpg";
+//const std::string texturePath2 = "crate.jpg";
 
+glm::vec3 cubPos;
 
 bool initOpenGL() {
 	if (!glfwInit()) {
@@ -48,22 +50,64 @@ bool initOpenGL() {
 	}
 
 	glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
+	glViewport(0, 0, gWindowWidth, gWindowHeight);
+	glEnable(GL_DEPTH_TEST);
 	return true;
+	
 }
 
 void InitVertices() {
-	//quad
+	//cube
 	GLfloat vertices[] = {
-		//position				texture coords
-		-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,		// Top left
-		0.5f,  0.5f, 0.0f,		1.0f, 1.0f,		// Top right
-		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		// Bottom right
-		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f		// Bottom left 
-	};
+		// position		 // tex coords
 
-	GLuint indices[] = {
-		0, 1, 2,  // First Triangle
-		0, 2, 3   // Second Triangle
+		// front face
+		-1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+
+		// back face
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+
+		// left face
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+		-1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+
+		// right face
+		1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+		1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+
+		// top face
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
+		1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
+
+		// bottom face
+		-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
 	};
 
 	//create memory in gpu
@@ -74,6 +118,8 @@ void InitVertices() {
 	//make current buffer object
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
+	//position coords
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
 	glEnableVertexAttribArray(0);
 
@@ -81,17 +127,12 @@ void InitVertices() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
-	// Set up index buffer
-	glGenBuffers(1, &ibo);	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
 	//load vertex & fragment shader
 	shaderProgram.loadShaders("basic.vert", "basic.frag");
 
 	//load textures
-	texture1.loadTexture(texturePath1, true);
-	texture2.loadTexture(texturePath2, true);
+	texture1.loadTexture(texturePath, true);
+	//texture2.loadTexture(texturePath2, true);
 
 }
 
@@ -103,32 +144,59 @@ int main() {
 
 	InitVertices();
 
+	//cube position, right infront, 5 away from camera
+	cubPos = glm::vec3(0.0f, 0.0f, 5.0f);
+
+	float cubeAngle = 0.0f;
+	double lastTime = glfwGetTime();
+	
 	//main loop
 	while (!glfwWindowShouldClose(gWindow)) {
 		showFPS(gWindow);
 
+		double currentTime = glfwGetTime();
+		double deltaTime = currentTime - lastTime;
+
+
 		//polls for events like keypresses
 		glfwPollEvents();
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		texture1.bind(0);
-		texture2.bind(1);
+		//texture2.bind(1);
+
+		cubeAngle += (float)(deltaTime*50.0f);
+		if(cubeAngle >= 360)
+			cubeAngle = 0.0f;
+
+		// configure camera
+		glm::mat4 model, view, projection;
+		model = glm::translate(model, cubPos)* glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
+		glm::vec3 targetPos(0.0f, 0.0f, -1.0f); 
+		glm::vec3 up(0.0f, 1.0f, 0.0f);
+		view = glm::lookAt(camPos, targetPos, up);
+		projection = glm::perspective(glm::radians(45.0f), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
+
 		shaderProgram.use();
-		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
+		shaderProgram.setUniform("model", model);
+		shaderProgram.setUniform("view", view);
+		shaderProgram.setUniform("projection", projection);
 
 
 		//bind vertex array object to draw
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
 		//unbind array
 		glBindVertexArray(0);
 		glfwSwapBuffers(gWindow);
+
+		lastTime = currentTime;
 	}
 
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ibo);
 
 	glfwTerminate();
 	return 0;

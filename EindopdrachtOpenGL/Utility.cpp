@@ -1,6 +1,9 @@
 #include "Utility.h"
 #include <sstream>
 
+int gWindowWidth = 1024;
+int gWindowHeight = 768;
+
 GLFWwindow* InitWindow(bool fullscreen) {
 
 	// handle versions for opengl (min version 3.3)
@@ -16,12 +19,15 @@ GLFWwindow* InitWindow(bool fullscreen) {
 		return glfwCreateWindow(pVidMode->width, pVidMode->height, APPTITLE, pMonitor, NULL);
 	}
 	else
-		return glfwCreateWindow(800, 600, APPTITLE, NULL, NULL);
+		return glfwCreateWindow(gWindowWidth, gWindowHeight, APPTITLE, NULL, NULL);
 }
+
 
 void glfw_onFramebufferSize(GLFWwindow* window, int width, int height)
 {
-	glViewport(0, 0, width, height);
+	gWindowWidth = width;
+	gWindowHeight = height;
+	glViewport(0, 0, gWindowWidth, gWindowHeight);
 }
 
 // shows fps in non windowed mode
@@ -49,3 +55,5 @@ void showFPS(GLFWwindow * window){
 	}
 	frameCount++;
 }
+
+
