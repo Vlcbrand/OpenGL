@@ -17,20 +17,23 @@ ShaderProgram::~ShaderProgram() {
 
 bool ShaderProgram::loadShaders(const char * vsFilename, const char * fsFilename)
 {
+	//get shaders from files
 	string vsString = fileToString(vsFilename);
 	string fsString = fileToString(fsFilename);
 	const GLchar* vsSourcePtr = vsString.c_str();
 	const GLchar* fsSourcePtr = fsString.c_str();
 
+	//create shaders
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 
+	//link shaders
 	glShaderSource(vs, 1, &vsSourcePtr, NULL);
 	glShaderSource(fs, 1, &fsSourcePtr, NULL);
 
+	//compile shaders
 	glCompileShader(vs);
 	checkCompileErrors(vs, VERTEX);
-
 	glCompileShader(fs);
 	checkCompileErrors(fs, FRAGMENT);
 
@@ -40,14 +43,14 @@ bool ShaderProgram::loadShaders(const char * vsFilename, const char * fsFilename
 		std::cerr << "Unable to create shader program!" << std::endl;
 		return false;
 	}
-
+	//attach shaders to the ShaderProgram (mHandle)
 	glAttachShader(mHandle, vs);
 	glAttachShader(mHandle, fs);
 
 	glLinkProgram(mHandle);
 	checkCompileErrors(mHandle, PROGRAM);
 
-
+	//delete because shaders are already linked
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 

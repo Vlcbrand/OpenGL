@@ -1,4 +1,3 @@
-#pragma once
 #include "Utility.h"
 #include <sstream>
 
@@ -18,6 +17,11 @@ GLFWwindow* InitWindow(bool fullscreen) {
 	}
 	else
 		return glfwCreateWindow(800, 600, APPTITLE, NULL, NULL);
+}
+
+void glfw_onFramebufferSize(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
 }
 
 // shows fps in non windowed mode

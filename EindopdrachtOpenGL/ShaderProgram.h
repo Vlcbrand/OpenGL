@@ -22,7 +22,9 @@ public:
 	void setUniform(const GLchar* name, const glm::vec3& vec3);
 	void setUniform(const GLchar* name, const glm::vec4& vec4);
 
-
+	inline GLuint getProgram() const {
+		 return mHandle;
+	}
 
 private:
 	std::string fileToString(const std::string& filename);

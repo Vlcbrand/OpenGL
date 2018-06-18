@@ -6,6 +6,7 @@
 #include "Utility.h"
 #include "KeyHandler.h"
 #include "ShaderProgram.h"
+#include "Texture2D.h"
 
 using namespace std;
 
@@ -16,6 +17,9 @@ GLFWwindow* gWindow = nullptr;
 //vertex buffer object, array object & shader
 GLuint vbo, vao, ibo;
 ShaderProgram shaderProgram;
+Texture2D texture1, texture2;
+const std::string texturePath1 = "airplane.png";
+const std::string texturePath2 = "crate.jpg";
 
 
 bool initOpenGL() {
@@ -32,6 +36,7 @@ bool initOpenGL() {
 		return false;
 	}
 	glfwMakeContextCurrent(gWindow);
+	glfwSetFramebufferSizeCallback(gWindow, glfw_onFramebufferSize);
 
 	glfwSetKeyCallback(gWindow, OnKey);
 
@@ -46,13 +51,14 @@ bool initOpenGL() {
 	return true;
 }
 
-void InitTriangle() {
-	//Triangle
+void InitVertices() {
+	//quad
 	GLfloat vertices[] = {
-		-0.5f,  0.5f, 0.0f,		// Top left
-		0.5f,  0.5f, 0.0f,		// Top right
-		0.5f, -0.5f, 0.0f,		// Bottom right
-		-0.5f, -0.5f, 0.0f		// Bottom left 
+		//position				texture coords
+		-0.5f,  0.5f, 0.0f,		0.0f, 1.0f,		// Top left
+		0.5f,  0.5f, 0.0f,		1.0f, 1.0f,		// Top right
+		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,		// Bottom right
+		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f		// Bottom left 
 	};
 
 	GLuint indices[] = {
@@ -65,18 +71,28 @@ void InitTriangle() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	//make current 
+	//make current buffer object
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
 	glEnableVertexAttribArray(0);
+
+	// Texture coords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	// Set up index buffer
 	glGenBuffers(1, &ibo);	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+	//load vertex & fragment shader
 	shaderProgram.loadShaders("basic.vert", "basic.frag");
+
+	//load textures
+	texture1.loadTexture(texturePath1, true);
+	texture2.loadTexture(texturePath2, true);
+
 }
 
 int main() {
@@ -85,7 +101,7 @@ int main() {
 		return -1;
 	}
 
-	InitTriangle();
+	InitVertices();
 
 	//main loop
 	while (!glfwWindowShouldClose(gWindow)) {
@@ -95,20 +111,17 @@ int main() {
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//draw
+		texture1.bind(0);
+		texture2.bind(1);
 		shaderProgram.use();
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
-		//change uniform variables in the shaders. (1 for offset, 1 for color)
-		GLfloat time = (GLfloat)glfwGetTime();
-		GLfloat blueColor = (sin(time) / 2) + 0.5f;
-		glm::vec2 pos;
-		pos.x = sin(time) / 2;
-		pos.y = cos(time) / 2;
-		shaderProgram.setUniform("vertColor", glm::vec4(0.0f, 0.0f, blueColor, 1.0f));
-		shaderProgram.setUniform("posOffset", pos);
 
+		//bind vertex array object to draw
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//unbind array
 		glBindVertexArray(0);
 		glfwSwapBuffers(gWindow);
 	}
