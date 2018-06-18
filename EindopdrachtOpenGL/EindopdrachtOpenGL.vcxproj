@@ -149,11 +149,17 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyHandler.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Utility.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\basic.frag" />
+    <None Include="bin\basic.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
