@@ -16,7 +16,7 @@ static bool FULLSCREEN = false;
 GLFWwindow* gWindow = nullptr;
 
 //vertex buffer object, array object & shader
-GLuint vbo, vao, ibo;
+GLuint vbo, vao;
 ShaderProgram shaderProgram;
 Texture2D texture1, texture2;
 const std::string texturePath = "wooden_crate.jpg";
@@ -107,6 +107,8 @@ void InitVertices() {
 		-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
 		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
 	};
+	//cube position, right infront, 5 away from camera
+	cubPos = glm::vec3(0.0f, 0.0f, 5.0f);
 
 	//create memory in gpu
 	glGenBuffers(1, &vbo);
@@ -118,12 +120,14 @@ void InitVertices() {
 	glBindVertexArray(vao);
 
 	//position coords
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(0));
 	glEnableVertexAttribArray(0);
 
 	// Texture coords
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+
+	glBindVertexArray(0);					// unbind to make sure other code doesn't change it
 
 	//load vertex & fragment shader
 	shaderProgram.loadShaders("basic.vert", "basic.frag");
@@ -142,9 +146,6 @@ int main() {
 
 	InitVertices();
 
-	//cube position, right infront, 5 away from camera
-	cubPos = glm::vec3(0.0f, 0.0f, 5.0f);
-
 	float cubeAngle = 0.0f;
 	double lastTime = glfwGetTime();
 	
@@ -158,22 +159,22 @@ int main() {
 
 		//polls for events like keypresses
 		glfwPollEvents();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		texture1.bind(0);
 		//texture2.bind(1);
+		glm::mat4 model, view, projection;
 
 		cubeAngle += (float)(deltaTime*50.0f);
 		if(cubeAngle >= 360)
 			cubeAngle = 0.0f;
 
 		// configure camera
-		glm::mat4 model, view, projection;
 		model = glm::translate(model, cubPos)* glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
 		glm::vec3 targetPos(0.0f, 0.0f, -1.0f); 
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
-		view = glm::lookAt(camPos, targetPos, up);
+		view = glm::lookAt(camPos, camPos + targetPos, up);
 		projection = glm::perspective(glm::radians(45.0f), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
 
 		shaderProgram.use();
