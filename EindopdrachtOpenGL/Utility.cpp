@@ -35,7 +35,7 @@ void showFPS(GLFWwindow * window){
 		double fps = (double)frameCount / elasped;
 		double msPerFrame = 1000.0 / fps;
 
-		// show fps and framecount on the title of the app
+		 //show fps and framecount on the title of the app
 		std::ostringstream outs;
 		outs.precision(3);
 		outs << std::fixed << APPTITLE << "       FPS : " << fps << "       Frame Time: " << msPerFrame << " (ms)";
