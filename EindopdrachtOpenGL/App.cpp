@@ -22,7 +22,7 @@ Texture2D texture1, texture2;
 const std::string texturePath = "wooden_crate.jpg";
 //const std::string texturePath2 = "crate.jpg";
 
-glm::vec3 cubPos;
+glm::vec3 cubePos;
 
 bool initOpenGL() {
 	if (!glfwInit()) {
@@ -108,7 +108,7 @@ void InitVertices() {
 		1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
 	};
 	//cube position, right infront, 5 away from camera
-	cubPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	cubePos = glm::vec3(0.0f, 0.0f, 5.0f);
 
 	//create memory in gpu
 	glGenBuffers(1, &vbo);
@@ -127,7 +127,7 @@ void InitVertices() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3* sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
-	glBindVertexArray(0);					// unbind to make sure other code doesn't change it
+	glBindVertexArray(0);
 
 	//load vertex & fragment shader
 	shaderProgram.loadShaders("basic.vert", "basic.frag");
@@ -170,7 +170,7 @@ int main() {
 			cubeAngle = 0.0f;
 
 		// configure camera
-		model = glm::translate(model, cubPos)* glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, cubePos)* glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
 		glm::vec3 targetPos(0.0f, 0.0f, -1.0f); 
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
